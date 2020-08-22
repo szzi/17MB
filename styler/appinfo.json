@@ -1,0 +1,17 @@
+{
+  "id": "com.smart.styler",
+  "version": "0.0.1",
+  "vendor": "My Company",
+  "type": "web",
+  "main": "index.html",
+  "title": "Smart Styler",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "requiredPermissions": [
+    "time",
+    "settings.read",
+    "activities.manage",
+    "camera",
+    "media"
+  ]
+}
