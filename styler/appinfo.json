@@ -1,14 +1,17 @@
 {
-  "id": "com.domain.app",
-  "version": "1.0.0",
+  "id": "com.smart.styler",
+  "version": "0.0.1",
   "vendor": "My Company",
   "type": "web",
   "main": "index.html",
-  "title": "new app",
+  "title": "Smart Styler",
   "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
   "requiredPermissions": [
     "time",
     "settings.read",
-    "activities.manage"
+    "activities.manage",
+    "camera",
+    "media"
   ]
 }
