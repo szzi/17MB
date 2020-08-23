@@ -62,10 +62,10 @@ class SimpleEcho(WebSocket):
 
         print("servo, humidity Ready..")
 
+        curHum=0
         try:
-            while True:
-                curHum=0
-                #PIR sensor
+            while True: 
+                # #PIR sensor
                 if GPIO.input(PIR_sensor) == 1:
                     GPIO.output(led_Y, 1)
                     GPIO.output(led_R, 0)
@@ -73,14 +73,14 @@ class SimpleEcho(WebSocket):
                     successcnt += 1
                     time.sleep(1)
 
-                if GPIO.input(PIR_sensorr) == 0:
+                elif GPIO.input(PIR_sensorr) == 0:
                     GPIO.output(led_R, 1)
                     GPIO.output(led_Y, 0)
                     print("not detected !")
                     time.sleep(1)
                     notcnt = 1
 
-                if successcnt == 5:
+                elif successcnt == 5:
                     print("start say hello")
                     successcnt = 0
                     responseString = '{"state":"connected", "type":"1", "message":""}'
