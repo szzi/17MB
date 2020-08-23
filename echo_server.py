@@ -8,12 +8,13 @@ import json
 
 
 socketList = dict()
+is_open=0
 
 class SimpleEcho(WebSocket):
 
     def handleMessage(self):
         requestString = json.dumps(self.data)
-        responseString = '{"state":"connected", "user" : "true"}'
+        responseString = '{"state":"connected", "type":"1", "message":""}'
 
         led_R=20
         led_Y=21
@@ -67,10 +68,15 @@ class SimpleEcho(WebSocket):
         print("sent message")
 
     def handleConnected(self):
+        is_open=1
         print(self.address, 'connected')
 
     def handleClose(self):
+        is_open=0
         print(self.address, 'closed')
 
 server = SimpleWebSocketServer('',9999, SimpleEcho)
-server.serveforever()
+while True:
+    server.serveforever()
+    if is_open==0:
+        break
