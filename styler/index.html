@@ -1,310 +1,373 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Smart Styler</title>
-<style type="text/css">
-    body {
-        width: 100%;
-        height: 100%;
-        background-color:#202020;
-    }
-    div {
-        position:absolute;
-        height:100%;
-        width:100%;
-        display: table;
-    }
-    h1 {
-        display: table-cell;
-        vertical-align: middle;
-        text-align:center;
-        color:#FFFFFF;
-    }
-</style>
-<script language="javascript" src="webOSjs-0.1.0/webOS.js"></script>
-<script type="text/javascript">
-window.onload = function() {
-    var bridge = new WebOSServiceBridge();
-    /*
-     *  getTimeApi calls gettime of systemservice, a module in the platform.
-     */
-    var getTimeApi = 'luna://com.webos.service.systemservice/clock/getTime';
-    var getTimeParams = '{}';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="jquery-3.5.1.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous">
+        </script>
+    <!-- <title>Document</title> -->
 
-    /*
-     *  helloApi calls the hello method of js_service template provided by CLI.
-     *  In this case, the service name is used as default name "com.domain.app.service" is.
-     *  If you change this service name, you need to change the service name of the following API.
-     *
-     *  If you change the name to helloparmas as you want, the contents will be reflected on the screen.
-     */
-    var helloApi = 'luna://com.domain.app.service/hello';
-    var helloParams = '{"name":"webOS"}';
+    <title>Smart Styler</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" type="text/css" href="./css/weather-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500&display=swap" rel="stylesheet">
 
-    function getTime_callback(msg){
-        var arg = JSON.parse(msg);
-        if (arg.returnValue) {
-            console.log("[APP_NAME: example web app] GETTIME_SUCCESS UTC : " + arg.utc);
-            //webOSSystem.PmLogString(6, "GETTIME_SUCCESS", '{"APP_NAME": "example web app"}', "UTC : " + arg.utc);
+    <style type="text/css">
+        body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            /* font-family: 'Crimson Text', serif;s */
+            font-family: 'Raleway', sans-serif;
+            font-size: 50px;
         }
-        else {
-            console.error("[APP_NAME: example web app] GETTIME_FAILED errorText : " + arg.errorText);
-            //webOSSystem.PmLogString(3, "GETTIME_FAILED", '{"APP_NAME": "example web app"}', "errorText : " + arg.errorText);
+
+        div {
+            position: relative;
+            /* height: 90%; */
+            width: 95%;
+            display: inline-block;
+            /* text-align: right; */
+
         }
-    }
 
-    function hello_callback(msg){
-        var arg = JSON.parse(msg);
-        if (arg.returnValue) {
-            document.getElementById("txt_msg").innerHTML = arg.Response;
-            console.log("[APP_NAME: example web app] CALLHELLO_SUCCESS response : " + arg.Response);
-            //webOSSystem.PmLogString(6, "CALLHELLO_SUCCESS", '{"APP_NAME": "example web app"}', "response : " + arg.Response);
+        #todaysinfo {
+            /* position:relative; */
+            font-weight: 400;
+            font-size: 100px;
+            text-align: right;
+            padding: 10px;
         }
-        else {
-            console.error("[APP_NAME: example web app] CALLHELLO_FAILED errorText : " + arg.errorText);
-            //webOSSystem.PmLogString(3, "CALLHELLO_FAILED", '{"APP_NAME": "example web app"}', "errorText : " + arg.errorText);
+
+        .todaystemp {
+            font-weight: 400;
+            font-size: 120px;
         }
-    }
 
-    bridge.onservicecallback = getTime_callback;
-    bridge.call(getTimeApi, getTimeParams);
-    document.getElementById("txt_msg").onclick = function() {
-        bridge.onservicecallback = hello_callback;
-        bridge.call(helloApi, helloParams);
-    };
-}
+        .todayshum {
+            font-weight: 400;
+            font-size: 120px;
+        }
 
-var isPlayingSHM = false;
-var eventListenerAdded = false;
-var options = {};
-var camera_id = "camera1";
-var handle_;
-var key = 7010;
-var uri1 = "camera://com.webos.service.camera2/";
-var CameraOption;
-options.mediaTransportType = "CAMERA";
-options.width = 840;
-options.height = 630;
-options.frameRate = 30;
-options.format = "JPEG";
-options.streamType = "JPEG";
-options.memType = "shmem";
-options.memSrc = "7010";
-var media_id = "media_id1";
-var refresh = true;
+        .first {
+            /* width: auto;
+            height: auto; */
+            max-width: 500px;
+            max-height: 300px;
+        }
 
-function playWithCamSHM() {
-    console.log("playWithCamSHM called");
-    document.getElementById("log").innerHTML = "getCameraList";
-    //Calling the Camera service getCameraList API
-    var request = webOS.service.request("luna://com.webos.service.camera2", {
-        method: "getCameraList",
-        parameters: {},
-        onFailure: function (inError) {
-            console.log(JSON.stringify(inError));
-            document.getElementById("log").innerHTML = "Error " + JSON.stringify(inError);
-        },
-        onComplete: function (inResponse) {
-            console.log(JSON.stringify(inResponse));
-            document.getElementById("log").innerHTML = "CameraList:" + JSON.stringify(inResponse);
-            // Sucess with return with camera id.
+        .second {
+            width: auto;
+            height: auto;
+            max-width: 500px;
+            max-height: 300px;
+        }
 
-            if (inResponse["deviceList"].length <= 0) {
-                document.getElementById("log").innerHTML = "Error : Device list is Empty!!!";
-            } else {
-                camera_id = inResponse["deviceList"][0].id;
-                //Callback function to call the camera service open API
-                getOpen();
+        img {
+            width: 80px;
+            height: 80px;
+        }
+    </style>
+    <script language="javascript" src="webOSjs-0.1.0/webOS.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+
+            var bridge = new WebOSServiceBridge();
+            /*
+             *  getTimeApi calls gettime of systemservice, a module in the platform.
+             */
+            var getTimeApi = 'luna://com.webos.service.systemservice/clock/getTime';
+            var getTimeParams = '{}';
+
+            /*
+             *  helloApi calls the hello method of js_service template provided by CLI.
+             *  In this case, the service name is used as default name "com.domain.app.service" is.
+             *  If you change this service name, you need to change the service name of the following API.
+             *
+             *  If you change the name to helloparmas as you want, the contents will be reflected on the screen.
+             */
+            var helloApi = 'luna://com.domain.app.service/hello';
+            var helloParams = '{"name":"webOS"}';
+
+
+            function getTime_callback(msg) {
+                var arg = JSON.parse(msg);
+                if (arg.returnValue) {
+                    console.log("[APP_NAME: example web app] GETTIME_SUCCESS UTC : " + arg.utc);
+                    //webOSSystem.PmLogString(6, "GETTIME_SUCCESS", '{"APP_NAME": "example web app"}', "UTC : " + arg.utc);
+                }
+                else {
+                    console.error("[APP_NAME: example web app] GETTIME_FAILED errorText : " + arg.errorText);
+                    //webOSSystem.PmLogString(3, "GETTIME_FAILED", '{"APP_NAME": "example web app"}', "errorText : " + arg.errorText);
+                }
             }
-        }
-    });
-}
 
-
-function getOpen() {
-    document.getElementById("log").innerHTML = "getOpen";
-    //Calling the Camera service open API
-    var request = webOS.service.request("luna://com.webos.service.camera2", {
-        method: "open",
-        parameters: {
-            "id": camera_id
-        },
-        onFailure: function (inError) {
-            console.log(JSON.stringify(inError));
-            document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
-        },
-        onComplete: function (inResponse) {
-            console.log(JSON.stringify(inResponse["handle"]));
-            document.getElementById("log").innerHTML = "camera1 service open success: " + JSON.stringify(inResponse);
-            //On sucessful return extarcting the value of handle
-            handle_ = inResponse["handle"];
-            options.handle_ = inResponse["handle"];
-            //Callback for setFormat Camera Service API
-            getSetFormat();
-        }
-    });
-}
-
-function getSetFormat() {
-    document.getElementById("log").innerHTML = "getSetFormat";
-    //Calling the Camera service setFormat API
-    var request = webOS.service.request("luna://com.webos.service.camera2", {
-        method: "setFormat",
-        parameters: {
-            "handle": options.handle_,
-            "params": {
-                "width": 640,
-                "height": 480,
-                "format": "JPEG",
-                "fps": 30
+            function hello_callback(msg) {
+                var arg = JSON.parse(msg);
+                if (arg.returnValue) {
+                    document.getElementById("txt_msg").innerHTML = arg.Response;
+                    console.log("[APP_NAME: example web app] CALLHELLO_SUCCESS response : " + arg.Response);
+                    //webOSSystem.PmLogString(6, "CALLHELLO_SUCCESS", '{"APP_NAME": "example web app"}', "response : " + arg.Response);
+                }
+                else {
+                    console.error("[APP_NAME: example web app] CALLHELLO_FAILED errorText : " + arg.errorText);
+                    //webOSSystem.PmLogString(3, "CALLHELLO_FAILED", '{"APP_NAME": "example web app"}', "errorText : " + arg.errorText);
+                }
             }
-        },
-        onFailure: function (inError) {
-            console.log(JSON.stringify(inError));
-            document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
-        },
-        onComplete: function (inResponse) {
-            console.log(JSON.stringify(inResponse));
-            document.getElementById("log").innerHTML = "success " + JSON.stringify(inResponse);
-            //Callback for start Preview APi of Camera service
-            startPreview();
+
+            bridge.onservicecallback = getTime_callback;
+            bridge.call(getTimeApi, getTimeParams);
+            document.getElementById("txt_msg").onclick = function () {
+                bridge.onservicecallback = hello_callback;
+                bridge.call(helloApi, helloParams);
+            };
         }
-    });
-}
-
-function startPreview() {
-    document.getElementById("log").innerHTML = "startPreview";
-    //Calling the Camera service startPreview  API
-    var request = webOS.service.request("luna://com.webos.service.camera2", {
-        method: "startPreview",
-        parameters: { "handle": options.handle_, "params": { "type": "sharedmemory", "source": "0" } },
-        onFailure: function (inError) {
-            console.log(JSON.stringify(inError));
-        },
-        onComplete: function (inResponse) {
-            console.log(JSON.stringify(inResponse));
-            options.memsrc = inResponse["key"]; //assigning shared memory key
-            // Callback for calling load function for loading ca,era pipeline
-            playWithCamSrc();
-        }
-    });
-}
-
-function startCapture() {
-    document.getElementById("log").innerHTML = "startCapture";
-    document.getElementById("imagePlace").src = "image1.jpeg";
-    var request = webOS.service.request("luna://com.webos.media", {
-        method: "takeCameraSnapshot",
-        parameters: {
-            "mediaId": media_id,
-            "location": "/tmp/",
-            "format": "jpg",
-            "width": 840,
-            "height": 630,
-            "pictureQuality": 30,
-        },
-        onFailure: function (inError) {
-            console.log(JSON.stringify(inError));
-            document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
-        },
-        onComplete: function (inResponse) {
-            console.log(JSON.stringify(inResponse));
-            document.getElementById("log").innerHTML = "success : [file:///tmp/capture.jpeg]";
-
-            document.getElementById("imagePlace").src = "/tmp/capture.jpeg_timestamp=" + new Date().getTime();
-            console.log("image src: " + document.getElementById("imagePlace").src);
-        }
-    });
-}
-
-function close() {
-    document.getElementById("log").innerHTML = "close";
-    var request = webOS.service.request("luna://com.webos.service.camera2", {
-        method: "close",
-        parameters: {
-            "handle": handle_
-        },
-        onFailure: function (inError) {
-            console.log(JSON.stringify(inError));
-            document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
-        },
-        onComplete: function (inResponse) {
-            console.log(JSON.stringify(inResponse));
-            document.getElementById("log").innerHTML = "success " + JSON.stringify(inResponse);
-        }
-    });
-}
-
-function playWithCamSrc() {
-    console.log("playWithCamSrc called");
-    var cameraOptions = escape(JSON.stringify(options));
-
-    var sourceElt = document.getElementById("cameraSource");
-    sourceElt.setAttribute('src', uri1);
-    sourceElt.setAttribute('type', 'service/webos-camera;cameraOption=' + cameraOptions);
-
-    document.getElementById("cameraVideo").load();
-}
-
-function updateVideoElement() {
-    var cameraVideo = document.getElementById("cameraVideo");
-    if (cameraVideo) {
-        if (isPlayingSHM)
-            return;
-        console.log("updateVideoElement:: " + cameraVideo);
-    } else {
-        console.log("updateVideoElement:: No oldVideo element present");
-    }
-
-    var sourceElt = document.createElement("source");
-    sourceElt.setAttribute("src", " ");
-    document.getElementById("cameraVideo").load();
-
-    if (!eventListenerAdded) {
-        eventListenerAdded = true;
-        cameraVideo.addEventListener("updatecamerastate", function (e) {
-            var obj = JSON.parse(e.detail);
-
-            console.log("detail msg :: " + obj.mediaId);
-
-            media_id = obj.mediaId;
-            console.log("media_id: " + media_id);
-        }, false);
-
-    }
-}
-
-function init() {
-    updateVideoElement();
-    var selectElt = document.getElementById("testMode");
-    var strUser = selectElt.options[selectElt.selectedIndex].value;
-    if (strUser == "camsrc") {
-        if (isPlayingSHM) {
-            document.getElementById("log").innerHTML = "";
-            //stopPreview();
-            isPlayingSHM = false;
-        }
-        options.memType = "device";
-        options.memSrc = "/dev/video0";
-        playWithCamSrc();
-    } else /*if (strUser == "camshm")*/ {
+        var isPlayingSHM = false;
+        var eventListenerAdded = false;
+        var options = {};
+        var camera_id = "camera1";
+        var handle_;
+        var key = 7010;
+        var uri1 = "camera://com.webos.service.camera2/";
+        var CameraOption;
+        options.mediaTransportType = "CAMERA";
+        options.width = 840;
+        options.height = 630;
+        options.frameRate = 30;
+        options.format = "JPEG";
+        options.streamType = "JPEG";
         options.memType = "shmem";
         options.memSrc = "7010";
-        playWithCamSHM();
-        isPlayingSHM = true;
-    }
-}
-</script>
+        var media_id = "media_id1";
+        var refresh = true;
+
+        function playWithCamSHM() {
+            console.log("playWithCamSHM called");
+            document.getElementById("log").innerHTML = "getCameraList";
+            //Calling the Camera service getCameraList API
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "getCameraList",
+                parameters: {},
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "Error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    document.getElementById("log").innerHTML = "CameraList:" + JSON.stringify(inResponse);
+                    // Sucess with return with camera id.
+
+                    if (inResponse["deviceList"].length <= 0) {
+                        document.getElementById("log").innerHTML = "Error : Device list is Empty!!!";
+                    } else {
+                        camera_id = inResponse["deviceList"][0].id;
+                        //Callback function to call the camera service open API
+                        getOpen();
+                    }
+                }
+            });
+        }
+
+
+        function getOpen() {
+            document.getElementById("log").innerHTML = "getOpen";
+            //Calling the Camera service open API
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "open",
+                parameters: {
+                    "id": camera_id
+                },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse["handle"]));
+                    document.getElementById("log").innerHTML = "camera1 service open success: " + JSON.stringify(inResponse);
+                    //On sucessful return extarcting the value of handle
+                    handle_ = inResponse["handle"];
+                    options.handle_ = inResponse["handle"];
+                    //Callback for setFormat Camera Service API
+                    getSetFormat();
+                }
+            });
+        }
+
+        function getSetFormat() {
+            document.getElementById("log").innerHTML = "getSetFormat";
+            //Calling the Camera service setFormat API
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "setFormat",
+                parameters: {
+                    "handle": options.handle_,
+                    "params": {
+                        "width": 640,
+                        "height": 480,
+                        "format": "JPEG",
+                        "fps": 30
+                    }
+                },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    document.getElementById("log").innerHTML = "success " + JSON.stringify(inResponse);
+                    //Callback for start Preview APi of Camera service
+                    startPreview();
+                }
+            });
+        }
+
+        function startPreview() {
+            document.getElementById("log").innerHTML = "startPreview";
+            //Calling the Camera service startPreview  API
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "startPreview",
+                parameters: { "handle": options.handle_, "params": { "type": "sharedmemory", "source": "0" } },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    options.memsrc = inResponse["key"]; //assigning shared memory key
+                    // Callback for calling load function for loading ca,era pipeline
+                    playWithCamSrc();
+                }
+            });
+        }
+
+        function startCapture() {
+            document.getElementById("log").innerHTML = "startCapture";
+            document.getElementById("imagePlace").src = "image1.jpeg";
+            var request = webOS.service.request("luna://com.webos.media", {
+                method: "takeCameraSnapshot",
+                parameters: {
+                    "mediaId": media_id,
+                    "location": "/tmp/",
+                    "format": "jpg",
+                    "width": 840,
+                    "height": 630,
+                    "pictureQuality": 30,
+                },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    document.getElementById("log").innerHTML = "success : [file:///tmp/capture.jpeg]";
+
+                    document.getElementById("imagePlace").src = "/tmp/capture.jpeg_timestamp=" + new Date().getTime();
+                    console.log("image src: " + document.getElementById("imagePlace").src);
+                }
+            });
+        }
+
+        function close() {
+            document.getElementById("log").innerHTML = "close";
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "close",
+                parameters: {
+                    "handle": handle_
+                },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    document.getElementById("log").innerHTML = "success " + JSON.stringify(inResponse);
+                }
+            });
+        }
+
+        function playWithCamSrc() {
+            console.log("playWithCamSrc called");
+            var cameraOptions = escape(JSON.stringify(options));
+
+            var sourceElt = document.getElementById("cameraSource");
+            sourceElt.setAttribute('src', uri1);
+            sourceElt.setAttribute('type', 'service/webos-camera;cameraOption=' + cameraOptions);
+
+            document.getElementById("cameraVideo").load();
+        }
+
+        function updateVideoElement() {
+            var cameraVideo = document.getElementById("cameraVideo");
+            if (cameraVideo) {
+                if (isPlayingSHM)
+                    return;
+                console.log("updateVideoElement:: " + cameraVideo);
+            } else {
+                console.log("updateVideoElement:: No oldVideo element present");
+            }
+
+            var sourceElt = document.createElement("source");
+            sourceElt.setAttribute("src", " ");
+            document.getElementById("cameraVideo").load();
+
+            if (!eventListenerAdded) {
+                eventListenerAdded = true;
+                cameraVideo.addEventListener("updatecamerastate", function (e) {
+                    var obj = JSON.parse(e.detail);
+
+                    console.log("detail msg :: " + obj.mediaId);
+
+                    media_id = obj.mediaId;
+                    console.log("media_id: " + media_id);
+                }, false);
+
+            }
+        }
+
+        function init() {
+            updateVideoElement();
+            var selectElt = document.getElementById("testMode");
+            var strUser = selectElt.options[selectElt.selectedIndex].value;
+            if (strUser == "camsrc") {
+                if (isPlayingSHM) {
+                    document.getElementById("log").innerHTML = "";
+                    //stopPreview();
+                    isPlayingSHM = false;
+                }
+                options.memType = "device";
+                options.memSrc = "/dev/video0";
+                playWithCamSrc();
+            } else /*if (strUser == "camshm")*/ {
+                options.memType = "shmem";
+                options.memSrc = "7010";
+                playWithCamSHM();
+                isPlayingSHM = true;
+            }
+        }
+    </script>
 </head>
+
 <body>
-    <div>
-        <h3 id="txt_msg">temperature</h3>
-        <h3 id="txt_msg">weather</h3>
-        <img src="rainy.png">
+    <div id="todaysinfo">
+        <table style="float: right;">
+            <tr>
+                <td class="first">
+                    <span class="todaystemp"> <img src="weather.png"></span><br>
+                    <span class="todayshum"><img src="rain.png"></span><br>
+                </td>
+                <td class="second">
+                    <span style="font-size: 180%;" class="w_dict"></span>
+                </td>
+            </tr>
+        </table>
     </div>
-    <br>
+    <div>
+        Button UI
+    </div>
     <div align="center">
-        <video id="cameraVideo">
+        <video id="cameraVideo" style="border:1px solid black"> 
             <source id="cameraSource" src="uri1" type="service/webos-camera">
         </video>
         <br>
@@ -323,5 +386,67 @@ function init() {
             <p id="log" style="color:white"> </p>
         </div>
     </div>
+
+    <script>
+        var dict = {
+            '01d': 'wi-day-sunny',
+            '02d': 'wi-day-cloudy',
+            '03d': 'wi-cloud',
+            '04d': 'wi-cloudy',
+            '09d': 'wi-showers',
+            '10d': 'wi-day-rain-mix',
+            '11d': 'wi-thunderstorm',
+            '13d': 'wi-snow',
+            '50d': 'wi-fog',
+            '01n': 'wi-night-clear',
+            '02n': 'wi-night-alt-cloudy',
+            '03n': 'wi-night-alt-cloudy-high',
+            '04n': 'wi-cloudy',
+            '09n': 'wi-night-alt-sprinkle',
+            '10n': 'wi-night-alt-showers',
+            '11n': 'wi-night-alt-thunderstorm',
+            '13n': 'wi-night-alt-snow',
+            '50n': 'wi-night-fog'
+        };
+
+        var apiURI = "http://api.openweathermap.org/data/2.5/weather?q=" + "Daegu" + "&appid=" + "6ef5d0b3ce448b21f5df8c7466f7c59b";
+        $.ajax({
+            url: apiURI,
+            dataType: "json",
+            type: "GET",
+            async: "false",
+            success: function (resp) {
+                // console.log(resp);
+                // console.log("현재온도 : " + (resp.main.temp - 273.15));
+                // console.log("현재습도 : " + resp.main.humidity);
+                // console.log("날씨 : " + resp.weather[0].main);
+                // console.log("상세날씨설명 : " + resp.weather[0].description);
+                // console.log("날씨 이미지 : " + resp.weather[0].icon);
+                // console.log("바람   : " + resp.wind.speed);
+                // console.log("나라   : " + resp.sys.country);
+                // console.log("도시이름  : " + resp.name);
+                // console.log("구름  : " + (resp.clouds.all) + "%");
+                var temper = String((resp.main.temp - 273.15)).substring(0, 3);//temperature
+                var hum = String((resp.main.humidity));//humidity
+                var weather = String((resp.weather[0].main));//weather
+                var imgurl = "http://openweathermap.org/img/w/" + resp.weather[0].icon + ".png";
+
+                $('.todaystemp').append(temper + '˚');
+                $('.todayshum').append(hum + '%');
+                $('.todaysweather').append(weather + '<img src=' + imgurl + '>' + resp.weather[0].icon);
+                var str = 'fa-5x' + ' ' + 'wi' + ' ' + dict[resp.weather[0].icon];
+                // console.log(str);
+                var str2 = '<i id="w_img" class=' + '"' + str + '"' + '></i>'
+                // console.log(str2);
+                $('.w_dict').append(str2);
+                // console.log(dict[resp.weather[0].icon]);
+            }
+        });
+    </script>
+
+    <script>
+        $('#todaysinfo').css('border', '1px solid blue')
+    </script>
 </body>
+
 </html>
