@@ -13,11 +13,13 @@ import json
 
 socketList = dict()
 is_open = 1
-
+is_break = 0
 class SimpleEcho(WebSocket):
 
     def handleMessage(self):
+        
         requestString = json.dumps(self.data)
+        print(requestString)
         responseString = '{"state":"connected", "type":"0", "message":""}'
 
         #connect sensor
@@ -28,7 +30,6 @@ class SimpleEcho(WebSocket):
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-
         GPIO.setup(led_R, GPIO.OUT)
         GPIO.setup(led_Y, GPIO.OUT)
         GPIO.setup(PIR_sensor, GPIO.IN)
@@ -38,7 +39,7 @@ class SimpleEcho(WebSocket):
         time.sleep(5)
         successcnt = 0
         notcnt = 0
-        
+            
         #PMW: change pulse
         p= GPIO.PWM(servomotor_pin, 50)
 
@@ -63,79 +64,90 @@ class SimpleEcho(WebSocket):
         print("servo, humidity Ready..")
 
         curHum=0
-        try:
-            while True: 
-                # #PIR sensor
-                if GPIO.input(PIR_sensor) == 1:
-                    GPIO.output(led_Y, 1)
-                    GPIO.output(led_R, 0)
-                    print("Motion Detected !")
-                    successcnt += 1
-                    time.sleep(1)
+        while True:
+            try:
+                while True: 
+                    # #PIR sensor
+                    if GPIO.input(PIR_sensor) == 1:
+                        GPIO.output(led_Y, 1)
+                        GPIO.output(led_R, 0)
+                        successcnt += 1
+                        print("Motion Detected",successcnt)
+                        time.sleep(1)
+                        if successcnt == 5:
+                            is_break=1
+                            print("start say hello")
+                            successcnt = 0
+                            responseString = '{"state":"connected", "type":"1", "message":""}'
 
-                elif GPIO.input(PIR_sensorr) == 0:
-                    GPIO.output(led_R, 1)
-                    GPIO.output(led_Y, 0)
-                    print("not detected !")
-                    time.sleep(1)
-                    notcnt = 1
+                    elif GPIO.input(PIR_sensorr) == 0:
+                        GPIO.output(led_R, 1)
+                        GPIO.output(led_Y, 0)
+                        print("not detected !")
+                        time.sleep(1)
+                        notcnt = 1
 
-                elif successcnt == 5:
-                    print("start say hello")
-                    successcnt = 0
-                    responseString = '{"state":"connected", "type":"1", "message":""}'
-
-                if notcnt == 1:
-                    notcnt = 0
-                    successcnt = 0
-                
-                print("start servo motor")
-                #survo motor
-                humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-                
-                if humidity is not None and temperature is not None:
-                    print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+                    if notcnt == 1:
+                        notcnt = 0
+                        successcnt = 0
                     
-                    if curHum != format(humidity):
-                        curHum = format(humidity)
-                        if responseString.find('"type":"1"')!=-1:
-                            print("type 3")
-                            responseString = '{"state":"connected", "type":"3", "message":'+str(curHum)+'}'
-                        else:
-                            responseString = '{"state":"connected", "type":"2", "message":'+str(curHum)+'}'
+                    #survo motor
+                    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+                    
+                    if humidity is not None and temperature is not None:
+                        print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+                        
+                        if curHum != format(humidity):
+                            curHum = format(humidity)
+                            if responseString.find('"type":"1"')!=-1:
+                                print("type 3")
+                                responseString = '{"state":"connected", "type":"3", "message":'+str(curHum)+'}'
+                            else:
+                                is_break=1
+                                responseString = '{"state":"connected", "type":"2", "message":'+str(curHum)+'}'
 
-                    if humidity>69:
-                        if flag==0:
-                            flag=1
-                            cnt = 0
-                            p.ChangeDutyCycle(7.5) #90
-                            time.sleep(1)
-                            p.ChangeDutyCycle(5.0)
-                            time.sleep(1)
-                            p.ChangeDutyCycle(2.5) #0
-                            time.sleep(1)    
-                    elif humidity<=69:
-                        if flag == 1:
-                            p.ChangeDutyCycle(7.5) #0
-                        flag=0
-                    time.sleep(1)     
-                else:
-                    print('Failed to get reading. Try again!')
-                    sys.exit(1)
-                
-                if responseString.find('"type":"0"')!=-1:
-                    break
-                
-                
-        except KeyboardInterrupt:
-            print("Stopped by User")
-            p.stop()
-            GPIO.cleanup()
-            responseString = '{"state":"disconnected", "type":"-1", "message":""}'
+                        if humidity>58:
+                            if flag==0:
+                                flag=1
+                                cnt = 0
+                                p.ChangeDutyCycle(7.5) #90
+                                time.sleep(1)
+                                p.ChangeDutyCycle(5.0)
+                                time.sleep(1)
+                                p.ChangeDutyCycle(2.5) #0
+                                time.sleep(1)    
+                        elif humidity<=58:
+                            if flag == 1:
+                                p.ChangeDutyCycle(7.5) #0
+                            flag=0
+                        time.sleep(1)     
+                    else:
+                        print('Failed to get reading. Try again!')
+                        sys.exit(1)
+                    
+                    if is_break==1:
+                        is_break=0
+                        break
+                    
+                    
+            except KeyboardInterrupt:
+                print("Stopped by User")
+                is_open = -1
+                p.stop()
+                GPIO.cleanup()
+                responseString = '{"state":"disconnected", "type":"-1", "message":""}'
+                self.sendMessage(responseString)
+            
+            print("I will send msg~")
             self.sendMessage(responseString)
-        
-        self.sendMessage(responseString)
-        print("sent message")
+
+
+            if is_open != 1:
+                print("break")
+                break
+
+            print("sleep 5 sec...")
+            time.sleep(5)  
 
     def handleConnected(self):
         is_open=1
@@ -148,9 +160,5 @@ class SimpleEcho(WebSocket):
 
 
 server = SimpleWebSocketServer('',9999, SimpleEcho)
-
-while True:
-    server.serveforever()
-    break_condition = 0
-    if is_open==0:
-        break
+server.serveforever()
+    
