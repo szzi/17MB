@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="jquery-3.5.1.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous">
+        </script>
+    <!-- <title>Document</title> -->
+
+    <title>Smart Styler</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" type="text/css" href="./css/weather-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500&display=swap" rel="stylesheet">
+
+    <style type="text/css">
+        body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            /* font-family: 'Crimson Text', serif;s */
+            font-family: 'Raleway', sans-serif;
+            font-size: 50px;
+        }
+
+        div {
+            position: relative;
+            /* height: 90%; */
+            width: 95%;
+            display: inline-block;
+            /* text-align: right; */
+
+        }
+
+        #todaysinfo {
+            /* position:relative; */
+            font-weight: 400;
+            font-size: 100px;
+            text-align: right;
+            padding: 10px;
+        }
+
+        .todaystemp {
+            font-weight: 400;
+            font-size: 120px;
+        }
+
+        .todayshum {
+            font-weight: 400;
+            font-size: 120px;
+        }
+
+        .first {
+            /* width: auto;
+            height: auto; */
+            max-width: 500px;
+            max-height: 300px;
+        }
+
+        .second {
+            width: auto;
+            height: auto;
+            max-width: 500px;
+            max-height: 300px;
+        }
+
+        img {
+            width: 80px;
+            height: 80px;
+        }
+    </style>
+    <script language="javascript" src="webOSjs-0.1.0/webOS.js"></script>
+    <script src="webOSjs-0.1.0/webOS.js" charset="utf-8"></script>
+    <script src="./socketModule/websocket.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="./css/weather-icons.min.css">
+
+    <script>
+        var isPlayingSHM = false;
+        var eventListenerAdded = false;
+        var options = {};
+        var camera_id = "camera1";
+        var handle_;
+        var key = 7010;
+        var uri1 = "camera://com.webos.service.camera2/";
+        var CameraOption;
+        options.mediaTransportType = "CAMERA";
+        options.width = 840;
+        options.height = 630;
+        options.frameRate = 30;
+        options.format = "JPEG";
+        options.streamType = "JPEG";
+        options.memType = "shmem";
+        options.memSrc = "7010";
+        var media_id = "media_id1";
+        var refresh = true;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</head>
+
+<body>
+    <div align="center">
+        <!-- style="visibility:hidden;" -->
+        Turning on the dehumidification mode is applied.
+    </div>
+    <div align="center" >
+        
+    </div>
+
+
+</body>
+
+</html>
