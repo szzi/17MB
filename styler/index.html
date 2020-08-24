@@ -196,8 +196,8 @@
 
         function startCapture() {
             document.getElementById("log").innerHTML = "startCapture";
-            document.getElementById("imagePlace").src = "image1.jpeg";
-            var request = webOS.service.request("luna://com.webos.media", {
+            //document.getElementById("imagePlace").src = "image1.jpeg";
+            /*var request = webOS.service.request("luna://com.webos.media", {
                 method: "takeCameraSnapshot",
                 parameters: {
                     "mediaId": media_id,
@@ -217,6 +217,55 @@
 
                     document.getElementById("imagePlace").src = "/tmp/capture.jpeg_timestamp=" + new Date().getTime();
                     console.log("image src: " + document.getElementById("imagePlace").src);
+                }
+            });*/
+            
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "startCapture",
+                parameters: {
+                    "handle": options.handle_,
+                    "params": {
+                        "width": 640,
+                        "height": 480,
+                        "format": "JPEG",
+                        "mode": "MODE_CONTINUOUS",
+                        "nimage": 2
+                    },
+                    "path":"/tmp/"
+                },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    
+                    var date = new Date();
+                    var imgSrc = "/tmp/Picture" + date.getDat() + date.getMonth() + date.getFullYear() + "-" + date.getHours() + date.getMinutes() + date.getSeconds() + ".jpeg";
+                    document.getElementById("log").innerHTML = "success : [file://" + imgSrc + "]";
+
+
+                    document.getElementById("imagePlace").src = imgSrc;
+                    console.log("image src: " + imgSrc);
+                }
+            });
+        }
+        
+        function stopCapture() {
+            document.getElementById("log").innerHTML = "stopCapture";
+
+            var request = webOS.service.request("luna://com.webos.service.camera2", {
+                method: "stopCapture",
+                parameters: {
+                    "handle": options.handle_
+                },
+                onFailure: function (inError) {
+                    console.log(JSON.stringify(inError));
+                    document.getElementById("log").innerHTML = "error " + JSON.stringify(inError);
+                },
+                onComplete: function (inResponse) {
+                    console.log(JSON.stringify(inResponse));
+                    document.getElementById("log").innerHTML = "success :" + JSON.stringify(inResponse);
                 }
             });
         }
@@ -329,6 +378,9 @@
                 <option value="camshm"> Test LG Camera SHM </option>
                 <option value="camsrc"> Test LG Camera SRC </option>
             </select>
+            <input type="button" value="init" onclick="init()">
+            <input type="button" value="startCapture" onclick="startCapture()">
+            <input type="button" value="stopCapture" onclick="stopCapture()">
         </div>
         <br>
 
