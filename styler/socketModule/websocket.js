@@ -1,7 +1,8 @@
 // need to change to websocket server's address
 var wsUri = "ws://192.168.43.6:9999";
 var output;
-var flag;
+var flag=0;
+var connected;
 
 function init()
 {
@@ -24,8 +25,8 @@ function testWebSocket()
 function onOpen(evt)
 {
   // writeToScreen("CONNECTED");
-  //flag : 최초인지아닌지 분간용
   flag=0;
+  connected=0;
   console.log("Connected");
   doSend();
  
@@ -38,57 +39,40 @@ function onClose(evt)
 
 function onMessage(evt)
 {
-  /*
-  if (flag)
-  {
-    //cnt값으로 판별 -> 숫자가 적으면 카메라 열고, 숫자가 크면 걍 무시...
-    //type1->cnt 값으로 판별, type2->문열기
-    
-    if(cnt<5)
-    {
-        console.log("camera open!");
-        location.href="../../"
-    }
-    else
-    {
-
-    }
-  }
-  else //flag=0 -> initial connection msg
-  {
-    setTimeout(function() {doSend();}, 5000);
-    flag=1;
-  }*/
   //var message = JSON.parse(evt.data);
-  var message = evt.data;
+  var message_recv = JSON.parse(evt.data);
   writeToScreen('<span style="color: blue;">RESPONSE: ' + message +'</span>');
-  // Call Notification method here
-  console.log(message)
-  /*
-  console.log(message.type);
-  console.log(message.state);
-*/
-  // websocket.close();
 
-  /*message parsing */
-/*
-  if (message.type=="1")
-  {
-    console.log("type1");
+  // Call Notification method here  
+  console.log(message_recv.type);
+  console.log(message_recv.state);
+
+  // websocket.close();
+  if(connected) //after second connection
+{
+  switch(message_recv.type){
+    case "1":
+            if(flag<20)
+            {
+              flag++;
+              console.log("detecting now..");
+            }
+            else
+            {
+              flag=0;
+              console.log("mic speaking");
+            }
+            break;
+    case "2":
+            console.log("door is opening~~~");
+    default:
+            console.log(message_recv);
+            console.log(message_recv)
   }
-  else if (message.type=="2")
-  {
-    console.log("type2");
-  }
-  else if(message.type=="3")
-  {
-    console.log("type3");
-  }
-  else{
-    console.log("what?!");
-  }
-*/
-setTimeout(function() {doSend();}, 5000);
+}
+else
+  connected=1;
+  setTimeout(function() {doSend();}, 2500);
 }
 
 function onError(evt)
@@ -98,12 +82,12 @@ function onError(evt)
 
 function doSend()
 {
-  var message = {
+  var message_send = {
       "ip_address" : "192.168.43.23"
   };
 
-  writeToScreen("SENT: " + JSON.stringify(message));
-  websocket.send(JSON.stringify(message));
+  writeToScreen("SENT: " + JSON.stringify(message_send));
+  websocket.send(JSON.stringify(message_send));
 }
 
 function writeToScreen(message)
