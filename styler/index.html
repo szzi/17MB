@@ -29,7 +29,7 @@
         div {
             position: relative;
             /* height: 90%; */
-            width: 95%;
+            /* width: 95%; */
             display: inline-block;
             /* text-align: right; */
 
@@ -41,6 +41,8 @@
             font-size: 100px;
             text-align: right;
             padding: 10px;
+            float: left;
+            /* margin-left: 50%; */
         }
 
         .todaystemp {
@@ -71,13 +73,48 @@
             width: 80px;
             height: 80px;
         }
+        
+        input[type="button"] {
+			background-color:white;
+			border:none;
+			padding: 10px;
+			text-align: center;
+		}
+		
+		input[type="button"]:focus {
+			outline: none;
+			color: DarkCyan;
+		}
     </style>
     <script language="javascript" src="webOSjs-0.1.0/webOS.js"></script>
     <script src="webOSjs-0.1.0/webOS.js" charset="utf-8"></script>
     <script src="./socketModule/websocket.js" charset="utf-8"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-database.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/weather-icons.min.css">
 
     <script>
+        //Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCUp3o7f26h1aM9uolhD9bFRU4ZMErLoLE",
+            authDomain: "mb-73eca.firebaseapp.com",
+            databaseURL: "https://mb-73eca.firebaseio.com/",
+            projectID: "mb-73eca",
+            storageBucket: "mb-73eca.appspot.com",
+            messagingSenderId: "381243194331"
+        };
+        firebase.initializeApp(config);
+
+        var rootRef = firebase.database().ref();
+        
+    	// uid
+        for (var i = 1; i <= 4; i++) {
+            rootRef.child('users').child(i).once('value', function(data) {
+                console.log('1: ', data.val());
+                //document.getElementById("info").innerHTML+= data.val().name + "<br>";
+            });
+        }
+        
         var isPlayingSHM = false;
         var eventListenerAdded = false;
         var options = {};
@@ -351,46 +388,91 @@
 </head>
 
 <body onload="init()">
-    <div id="todaysinfo">
-        <table style="float: right;">
-            <tr>
-                <td class="first">
-                    <span class="todaystemp"> <img src="weather.png"></span><br>
-                    <span class="todayshum"><img src="rain.png"></span><br>
-                </td>
-                <td class="second">
-                    <span style="font-size: 180%;" class="w_dict"></span>
-                </td>
-            </tr>
-        </table>
+    <div style="border:1px solid blue; width:80%">
+		<div style="float:left; padding:10px; margin-right:10%;">
+			<video id="cameraVideo" style="border:1px solid black;"> 
+				<source id="cameraSource" src="uri1" type="service/webos-camera">
+			</video>
+			<br>
+
+			<div align="left">
+				<select id="testMode">
+					<option value="camshm"> Test LG Camera SHM </option>
+					<option value="camsrc"> Test LG Camera SRC </option>
+				</select>
+				<input type="button" value="init" onclick="init()">
+				<input type="button" value="startCapture" onclick="startCapture()">
+				<input type="button" value="stopCapture" onclick="stopCapture()">
+			</div>
+			<br>
+			<div align="left">
+				<p id="log" style="color:black; font-size:10pt;"> </p>
+			</div>
+		</div>
+
+		<div id="todaysinfo">
+			<table>
+				<tr>
+					<td class="first">
+						<span class="todaystemp"> <img src="weather.png"></span><br>
+						<span class="todayshum"><img src="rain.png"></span><br>
+					</td>
+					<td class="second">
+						<span style="font-size: 180%;" class="w_dict"></span>
+					</td>
+				</tr>
+			</table>
+		</div>
     </div>
+    <br>
     <div>
         Button UI
     </div>
-    <div align="center">
-        <video id="cameraVideo" style="border:1px solid black"> 
-            <source id="cameraSource" src="uri1" type="service/webos-camera">
-        </video>
-        <br>
-
-        <div align="center">
-            <select id="testMode">
-                <option value="camshm"> Test LG Camera SHM </option>
-                <option value="camsrc"> Test LG Camera SRC </option>
-            </select>
-            <input type="button" value="init" onclick="init()">
-            <input type="button" value="startCapture" onclick="startCapture()">
-            <input type="button" value="stopCapture" onclick="stopCapture()">
-        </div>
-        <br>
-
-        <img id="imagePlace" src="image1.jpeg"> </img>
-        <br>
-        <div align="center">
-            <p id="log" style="color:white"> </p>
-        </div>
-    </div>
-    <div id="output"></div>
+    <br>
+	<div id="button" style="margin-left:20%; float:center; font-size:10pt; border: 1px solid blue; border-radius:10px; padding:10px;">
+		<div align="center">
+			<input type="image" src="./power-button.png" alt="power" width="50px" height="50px">
+		</div>
+		<div align="center">
+			<input type="button" value="Heavy"><br>
+			<input type="button" value="Normal"><br>
+			<input type="button" value="Light"><br>
+			<input type="image" src="./refresh.png" alt="Refresh" width="50px" height="50px"><br>
+			Refresh
+		</div>
+		<div align="center">
+			<input type="button" value="Suits/Coats"><br>
+			<input type="button" value="Pants Crease"><br>
+			<input type="button" value="Downloaded"><br>
+			<input type="image" src="./specialcare.png" alt="Special Care" width="50px" height="50px"><br>
+			Special Care
+		</div>
+		<div align="center">
+			<input type="button" value="Heavy"><br>
+			<input type="button" value="Bedding"><br>
+			<input type="button" value="Kid's Item"><br>
+			<input type="button" value="Heavy Duty"><br>
+			<input type="image" src="./sanitary.png" alt="Sanitary" width="50px" height="50px"><br>
+			Sanitary
+		</div>
+		<div align="center">
+			<input type="button" value="Normal"><br>
+			<input type="button" value="Rain/Snow"><br>
+			<input type="button" value="Time Dry"><br>
+			<input type="image" src="./dry.png" alt="Gentle Dry" width="50px" height="50px"><br>
+			Gentle Dry
+		</div>
+		<div align="center">
+			<h3 id="timeleft"> </h3>
+			<input type="image" src="./clock.png" alt="Delay Start" width="50px" height="50px"><br>
+			Delay Start
+		</div>
+		<div align="center">
+			<input type="image" src="./pause-play.png" alt="Hold to Start" width="50px" height="50px"><br>
+			Hold to Start
+		</div>
+	</div>
+    <p id="info" style="color: red;"> </p>
     <script>
         var dict = {
             '01d': 'wi-day-sunny',
@@ -446,10 +528,6 @@
                 // console.log(dict[resp.weather[0].icon]);
             }
         });
-    </script>
-
-    <script>
-        $('#todaysinfo').css('border', '1px solid blue')
     </script>
 </body>
 
