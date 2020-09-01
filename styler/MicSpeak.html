@@ -40,52 +40,25 @@
         }
 
 
-#speech.btn {
-	border: none;
-  padding: 0;
-  border-radius: 100%;
-  width: 150px;
-  height: 150px;
-  font-size: 1.5em;
-  color: #fff;
-  padding: 0;
-  margin: 0;
-  background: #FF3D7F;
-	position: relative;
-  display: inline-block;
-    line-height: 50px;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
-    -ms-touch-action: manipulation;
-    touch-action: manipulation;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-image: none;
-}
-
 .pulse-ring {
   content: '';
   width: 150px;
+  z-index:1;
   height: 150px;
+  left:45%;
   border: 5px solid #FF3D7F;
   border-radius: 50%;
   position: absolute;
-  top: -5px;
-  left: -5px;
   animation: pulsate infinite 2s;
 }
 
 @-webkit-keyframes pulsate {
   0% {
-    -webkit-transform: scale(1, 1);
+    -webkit-transform: scale(1.2, 1.2);
     opacity: 1;
   }
   100% {
-    -webkit-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.5, 1.5);
     opacity: 0;
   }
 }
@@ -103,19 +76,12 @@
 
 <body>
     <div style="height:200px;"></div>
-    <div style="display:none;">
-    <!-- <div style="display:visible;"> -->
-        Applying the dehumidification mode...
-    </div>
     <div style="margin-Top:50px;">
-        Say "Hi LG~".
+      Please put your face close to the camera.
     </div>
     <div class="container">
-        <button id="speech" class="btn" style="z-index: 1;">
-        <img id="microphone" src="mic.png"/>
-            <!--일단 버튼으로 해둚,,-->
-          <div class="pulse-ring"></div>
-        </button>
+        <div class="pulse-ring">  </div>
+        <img id="microphone" style="width:12%;height:auto;z-index:2;left:45%;position:absolute;"src="../styler/static/ar-camera.png"/>
     </div>
 </body>
 
