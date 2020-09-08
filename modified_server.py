@@ -122,20 +122,23 @@ class SimpleEcho(WebSocket):
                             vs = VideoStream(src=0).start()
                             # vs = VideoStream(usePiCamera=True).start()
                             time.sleep(2.0)
+                          
                             # start the FPS counter
                             fps = FPS().start()
+                            #before_name = "Unknown"
                             # loop over frames from the video file stream
                             while True:
                                 # grab the frame from the threaded video stream and resize it
                                 # to 500px (to speedup processing)
+                                
                                 frame = vs.read()
+                                print('start resizing')
                                 frame = imutils.resize(frame, width=500)
                                 
                                 # convert the input frame from (1) BGR to grayscale (for face
                                 # detection) and (2) from BGR to RGB (for face recognition)
                                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                                
                                 # detect faces in the grayscale frame
                                 rects = detector.detectMultiScale(gray, scaleFactor=1.1,
                                     minNeighbors=5, minSize=(30, 30))
@@ -146,10 +149,12 @@ class SimpleEcho(WebSocket):
                                 # compute the facial embeddings for each face bounding box
                                 encodings = face_recognition.face_encodings(rgb, boxes)
                                 names = []
+                                print(encodings)
                                 # loop over the facial embeddings
                                 for encoding in encodings:
                                     # attempt to match each face in the input image to our known
                                     # encodings
+                                    print('encoding start')
                                     matches = face_recognition.compare_faces(data["encodings"],
                                         encoding)
                                     name = "Unknown"
@@ -173,8 +178,7 @@ class SimpleEcho(WebSocket):
                                     # update the list of names
                                     names.append(name)
                                 print(names[0])
-                                if name == "Unknwon":
-                                    break
+
                                 # loop over the recognized faces
                                 for ((top, right, bottom, left), name) in zip(boxes, names):
                                     # draw the predicted face name on the image
@@ -187,8 +191,10 @@ class SimpleEcho(WebSocket):
                                 cv2.imshow("Frame", frame)
                                 key = cv2.waitKey(1) & 0xFF
                                 # if the `q` key was pressed, break from the loop
-                                if key == ord("q"):
+                                if names[0] != "Unknwon" and before_name == names[0]:
                                     break
+                                time.sleep(2)
+                                before_name = names[0]
                                 # update the FPS counter
                                 fps.update()
                             # stop the timer and display FPS information
@@ -201,7 +207,7 @@ class SimpleEcho(WebSocket):
 
 
                             # send user name
-                            responseString = '{"work":"0", "username":'+names[0]+'}'
+                            responseString = '{"work":"1", "username":'+names[0]+'}'
                             break
                         else:
                             #적외선 인식작업 재개
@@ -261,3 +267,4 @@ class SimpleEcho(WebSocket):
         print(self.address, 'closed')
 server = SimpleWebSocketServer('',9999, SimpleEcho)
 server.serveforever()
+
