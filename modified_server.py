@@ -116,7 +116,7 @@ class SimpleEcho(WebSocket):
                             # cascade for face detection
                             print("[INFO] loading encodings + face detector...")
                             data = pickle.loads(open("encodings.pickle", "rb").read())
-                            detector = cv2.CascadeClassifier("haarcascace_frontalface_default.xml")
+                            detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
                             # initialize the video stream and allow the camera sensor to warm up
                             print("[INFO] starting video stream...")
                             vs = VideoStream(src=0).start()
@@ -135,6 +135,7 @@ class SimpleEcho(WebSocket):
                                 # detection) and (2) from BGR to RGB (for face recognition)
                                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                                
                                 # detect faces in the grayscale frame
                                 rects = detector.detectMultiScale(gray, scaleFactor=1.1,
                                     minNeighbors=5, minSize=(30, 30))
@@ -171,9 +172,8 @@ class SimpleEcho(WebSocket):
                                     
                                     # update the list of names
                                     names.append(name)
-                                    is_catch=1
-                                #temporary jaeyeong
-                                if is_catch==1:
+                                print(names[0])
+                                if name == "Unknwon":
                                     break
                                 # loop over the recognized faces
                                 for ((top, right, bottom, left), name) in zip(boxes, names):
@@ -201,7 +201,7 @@ class SimpleEcho(WebSocket):
 
 
                             # send user name
-                            responseString = '{"work":"0", "username":'+name[0]+'}'
+                            responseString = '{"work":"0", "username":'+names[0]+'}'
                             break
                         else:
                             #적외선 인식작업 재개
