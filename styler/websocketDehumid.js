@@ -6,7 +6,7 @@ var server_status;
 function init()
 {
   output = document.getElementById("output");
-  console.log("init");
+  console.log("continue");
   print(init);
   testWebSocket();
 }
@@ -26,55 +26,34 @@ function onOpen(evt)
 }
 function onClose(evt)
 {
-  console.log("DISCONNECTED");
+  // console.log("DISCONNECTED");
 }
 function onMessage(evt)
 {
   var message_recv = JSON.parse(evt.data);
   console.log('RESPONSE: ' + message_recv);
-  // Call Notification method humere  
-  console.log("work name: "+ message_recv.work); //작업의 종류
-  console.log("user recognized: "+message_recv.username); //인식된 사람 이름.
 
   work_type = message_recv.work;
-  person = message_recv.username;
 
-  if (message_recv.work==0)//receiving information
+  if (message_recv.work==2)
   {
-    console.log(person);
-    console.log("person recongnized");
-    writeToScreen("Hi "+person+ ", We recommend this course"); //소리내기: 뫄뫄님 안녕하세요!!!!! //DB에서 꺼내오기
+    writeToScreen("Dehumiditication is completed!") //습기제거 종료
+    setTimeout(function() {location.href='index.html'}, 3000);
     doSend_ticket();
 
   }
-  else if(message_recv.work==2) //humidity
-  {
-    doSend_ticket(); //소리내기 습도조절을 시작합니다!!!
-    location.href ='Dehumidification.html'
-  }
-  else
-  {
-    doSend_ticket();
-  }
-
 }
 function onError(evt)
 {
   console.log('ERROR:'+ evt.data);
 }
-function doSend(stylingType)
+function doSend()
 {
   var message_send = {
     "work" : "1"
 };
-console.log(stylingType + 'START')
 console.log("SENT: " + JSON.stringify(message_send));
-//작업시작 메시지
 websocket.send(JSON.stringify(message_send));
-setTimeout(function() {websocket.send(JSON.stringify(message_send))}, 15000);
-console.log(stylingType + 'DONE')
-
-
 }
 function doSend_ticket()
 {
@@ -86,9 +65,10 @@ function doSend_ticket()
 }
 function writeToScreen(message)
 {
-   var greet = document.getElementById("ButtonUI");
-   greet.innerHTML = message;
-  //  output.appendChild(pre);
+   var pre = document.createElement("p");
+   pre.style.wordWrap = "break-word";
+   pre.innerHTML = message;
+   output.appendChild(pre);
    console.log(message)
 }
 // Notification code will be put here
