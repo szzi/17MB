@@ -19,25 +19,22 @@ import argparse
 import imutils
 import pickle
 import cv2
-is_work, is_open ,is_catch = 0,0,0
+is_work, is_open, temp_closeCondition,plus = 0,0,0,1
 
 class SimpleEcho(WebSocket):        
 
     def handleConnected(self):
         print(self.address, 'open')
-        global is_work
-        global is_open
-        global is_catch
         
 
     def handleMessage(self):
         global is_work
         global is_open
-        global is_catch
+        global temp_closeCondition
+        global plus
         
         print('is_work',is_work)
         print('is_open',is_open)
-        print('is_catch',is_catch)
         
         led_R=20
         led_Y=21
@@ -79,7 +76,7 @@ class SimpleEcho(WebSocket):
 
         requestString = literal_eval(requestObject)
         obj = json.loads(requestString)
-        print('is_work:',is_work,'     is_open',is_open)
+        print('is_work:',is_work,'temp_closeCondition     is_open',is_open)
         print(obj["work"])
         msg = obj["work"]
 
@@ -98,18 +95,23 @@ class SimpleEcho(WebSocket):
         else :
             try:
                 while True:
+                    if temp_closeCondition <0:
+                        plus =1
+                    temp_closeCondition = temp_closeCondition + plus
+                    print('[SYSTMEM]: listening...')
+                    print('temp_closeCondition: ',temp_closeCondition)
+                    time.sleep(3)
                     ##PIR sensor
                     #Human detected && not working
-                    if GPIO.input(PIR_sensor) == 1 and is_work==0:
+                    if GPIO.input(PIR_sensor) == 1 and is_work==0 and is_open ==0:
                         GPIO.output(led_Y, 1)
                         GPIO.output(led_R, 0)
                         # type_=1
-                        print("person detected, count start..")
+                        print("[work0]: person detected, count start..")
                         time.sleep(5)
-                        print("count done, [work0] start..")
+                        print("[work0]: count done, [work0] start..")
 
                         if GPIO.input(PIR_sensor) == 1:
-                            is_work=1
 
                             # 카메라 켜고 사람 인식 start
                             
@@ -143,7 +145,6 @@ class SimpleEcho(WebSocket):
                                 # to 500px (to speedup processing)
                                 
                                 frame = vs.read()
-                                print('[work0]: start resizing')
                                 frame = imutils.resize(frame, width=500)
                                 
                                 # convert the input frame from (1) BGR to grayscale (for face
@@ -223,9 +224,7 @@ class SimpleEcho(WebSocket):
                                     #fps.update()
                                     # stop the timer and display FPS information
                                     #fps.stop()
-                                    
-
-
+                                
                             # send user name
                             if wait_person ==0:
                                 responseString = '{"work":"0", "username":"'+names[0]+'"}'
@@ -233,45 +232,53 @@ class SimpleEcho(WebSocket):
                             else:
                                 responseString = '{"work":"1", "username":"ghost"}'
                                 break
-                        #else:
-                            #적외선 인식작업 재개
+                        else:
+                            print('[work0]: no user')
                             #continue
                             
                     #Human not detected || working (door is opening , styling ...)
                     else:
                         GPIO.output(led_R, 1)
                         GPIO.output(led_Y, 0)
-                        print("person: not detected !")
+                        print("[work2]: person: not detected !")
                         #survo motor
                         if is_work == 0 or is_open == 1:
-                            print('[work2]: door is opened or machine not working')
+                            if is_open ==1:
+                                print('[work2]: door is opened')
+                            if is_work ==0:
+                                print('[work2]: styler is idle')
+
                             humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
                             if humidity is not None and temperature is not None:
-                                print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+                                #print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
                                 humidity = math.floor(humidity)
-                                print(humidity)
-                                if humidity>70:
+                                #print(humidity)
+                                if humidity>70 and is_open==0 and plus ==1:
                                     #door is closed but humidity is high-> we should open
                                     if is_open==0:
-                                        print('open door')
+                                        print('[work2]: Temp=',humidity,'>70  open door')
                                         #open
                                         p.ChangeDutyCycle(7.5) #90
                                         is_open=1
                                         time.sleep(1)
-                                        is_work = 1
+                                        temp_closeCondition = 0
                                         responseString = '{"work":"2", "username":"open"}'
                                         break
                                 #we should close
-                                else:
+                                elif temp_closeCondition > 5 or humidity <= 70:
                                     if is_open==1:
-                                        print('close door')
+                                        plus =-1
+                                        print('[work2]: Temp=',humidity,'<70  close door')
                                         p.ChangeDutyCycle(5.0)
                                         is_open = 0
-                                        is_work = 0
                                         responseString = '{"work":"2", "username":"close"}'
                                         break
+                                
                         else:
-                            print("[work2]: it is  working and it is closed")
+                            if is_open ==0:
+                                print('[work2]: door is closed')
+                            if is_work ==1:
+                                print('[work2]: styler is working')
 
             except KeyboardInterrupt:
                 print("Stopped by User")
