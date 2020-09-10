@@ -3,6 +3,7 @@ var wsUri = "ws://192.168.43.6:9999";
 var output;
 var work,username;
 var server_status;
+
 function init()
 {
   output = document.getElementById("output");
@@ -49,8 +50,17 @@ function onMessage(evt)
   }
   else if(message_recv.work==2) //humidity
   {
-    doSend_ticket(); //소리내기 습도조절을 시작합니다!!!
-    location.href ='Dehumidification.html'
+    if (username=="open")
+    {
+      console.log("Dehumidification mode on");
+      //소리내기 습도조절을 시작합니다!!!
+    }
+    else if (username=="close")
+    {
+      console.log("Dehumidification complete");
+      //소리내기 습도조절이 완료되었습니다!
+    }
+    doSend_ticket(); 
   }
   else
   {
@@ -67,11 +77,11 @@ function doSend(stylingType)
   var message_send = {
     "work" : "1"
 };
-console.log(stylingType + 'START')
+console.log(stylingType + 'START STYLING')
 console.log("SENT: " + JSON.stringify(message_send));
 //작업시작 메시지
 websocket.send(JSON.stringify(message_send));
-setTimeout(function() {websocket.send(JSON.stringify(message_send))}, 15000);
+setTimeout(function() {websocket.send(JSON.stringify(message_send))}, 8000);
 console.log(stylingType + 'DONE')
 
 
