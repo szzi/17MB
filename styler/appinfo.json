@@ -5,8 +5,8 @@
   "type": "web",
   "main": "index.html",
   "title": "Smart Styler",
-  "icon": "icon.png",
-  "largeIcon": "largeIcon.png",
+  "icon": "static/icon.png",
+  "largeIcon": "static/largeIcon.png",
   "requiredPermissions": [
     "time",
     "settings.read",

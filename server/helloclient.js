@@ -8,6 +8,7 @@ var service = new Service("com.example.helloclient"); // Register com.example.he
 
 console.log("simple call");
 //Change @SERVICE-NAME@ to real service name
+/*
 service.call("luna://@SERVICE-NAME@/hello", {}, function(message) {
     context.log(pmloglib.LOG_INFO, "SERVICE_CALL",{}, "call @SERVICE-NAME@/hello");
     console.log("message payload: " + JSON.stringify(message.payload));
@@ -25,3 +26,23 @@ service.call("luna://@SERVICE-NAME@/hello", {}, function(message) {
         }
     });
 });
+*/
+
+/**************************************** */
+var http = require('http');
+var fs = require('fs');
+var app = http.createServer(function(request,response){
+    var url = request.url;
+    if(request.url == '/'){
+      url = '/index.html';
+    }
+    if(request.url == '/favicon.ico'){
+      return response.writeHead(404);
+    }
+    response.writeHead(200);
+    console.log(__dirname + url);
+    response.end(fs.readFileSync(__dirname + url));
+    //사용자에게 전송할 데이터를 생성한다
+ 
+});
+app.listen(3000);

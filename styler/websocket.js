@@ -3,6 +3,7 @@ var wsUri = "ws://192.168.43.6:9999";
 var output;
 var work,username;
 var server_status;
+var stylingType_done;
 
 function init()
 {
@@ -35,12 +36,12 @@ function onMessage(evt)
   console.log('RESPONSE: ' + message_recv);
   // Call Notification method humere  
   console.log("work name: "+ message_recv.work); //작업의 종류
-  console.log("user recognized: "+message_recv.username); //인식된 사람 이름.
+  console.log("user/work recognized: "+message_recv.username); //인식된 사람 이름.
 
   work_type = message_recv.work;
   person = message_recv.username;
 
-  if (message_recv.work==0)//receiving information
+  if (work_type==0)//receiving information
   {
     console.log(person);
     console.log("person recongnized");
@@ -48,23 +49,36 @@ function onMessage(evt)
     doSend_ticket();
 
   }
-  else if(message_recv.work==2) //humidity
+  else if(work_type==2) //humidity
   {
-    if (username=="open")
+    if (person=="open")
     {
       console.log("Dehumidification mode on");
       //소리내기 습도조절을 시작합니다!!!
     }
-    else if (username=="close")
+    else if (person=="close")
     {
       console.log("Dehumidification complete");
       //소리내기 습도조절이 완료되었습니다!
     }
+    else
+    {
+      console.log("소리안냄");      
+    }
     doSend_ticket(); 
   }
-  else
-  {
-    doSend_ticket();
+  else if (work_type==1 && username=="1")
+  { //work_type ==1
+    var message_send = {
+      "work" : "1"
+  };
+    setTimeout(function() {
+      websocket.send(JSON.stringify(message_send));
+      console.log(stylingType_done + ' DONE')
+    }, 5000);
+  }
+  else{
+
   }
 
 }
@@ -77,13 +91,11 @@ function doSend(stylingType)
   var message_send = {
     "work" : "1"
 };
-console.log(stylingType + 'START STYLING')
+console.log(stylingType + ' START STYLING')
 console.log("SENT: " + JSON.stringify(message_send));
 //작업시작 메시지
 websocket.send(JSON.stringify(message_send));
-setTimeout(function() {websocket.send(JSON.stringify(message_send))}, 8000);
-console.log(stylingType + 'DONE')
-
+stylingType_done = stylingType;
 
 }
 function doSend_ticket()

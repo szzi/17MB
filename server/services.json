@@ -1,0 +1,9 @@
+{
+  "id": "com.smart.styler.service",
+  "description": "HelloWorld Service",
+  "services": [
+    {
+      "name": "com.smart.styler.service"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "com.domain.app.service",
+  "name": "com.smart.styler.service",
   "version": "1.0.0",
   "description": "Helloworld service",
   "main": "helloworld_webos_service.js",
