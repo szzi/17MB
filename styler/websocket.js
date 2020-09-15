@@ -4,11 +4,22 @@ var output;
 var work,username;
 var server_status;
 var stylingType_done;
+var msg = new SpeechSynthesisUtterance();
+  
+var voices = window.speechSynthesis.getVoices();
+msg.volume = 1;
+msg.text = "";
+msg.lang = 'en';
 
 function init()
 {
+  
+
+console.log('asdgasdg');
   output = document.getElementById("output");
   console.log("init");
+  window.speechSynthesis.speak(msg);
+
   print(init);
   testWebSocket();
 }
@@ -41,25 +52,39 @@ function onMessage(evt)
   work_type = message_recv.work;
   person = message_recv.username;
 
+
+
   if (work_type==0)//receiving information
   {
     console.log(person);
     console.log("person recongnized");
-    writeToScreen("Hi "+person+ ", We recommend this course"); //소리내기: 뫄뫄님 안녕하세요!!!!! //DB에서 꺼내오기
-    doSend_ticket();
+      //인사 
+    if (person!="" &&person!="ghost")
+    {
+      msg.text = "Hi, We recommend this course";
+      window.speechSynthesis.speak(msg);
+      writeToScreen("Hi "+person+ ", We recommend this course"); //소리내기: 뫄뫄님 안녕하세요!!!!! //DB에서 꺼내오기
+
+    }
+  doSend_ticket();
 
   }
   else if(work_type==2) //humidity
   {
     if (person=="open")
     {
-      console.log("Dehumidification mode on");
+      console.log("Dehumidification mode on, Door will be opened");
+      msg.text = "Dehumidification mode on, Door will be opened";
+      window.speechSynthesis.speak(msg);
+    
       //소리내기 습도조절을 시작합니다!!!
     }
     else if (person=="close")
     {
       console.log("Dehumidification complete");
       //소리내기 습도조절이 완료되었습니다!
+      msg.text = "Dehumidification complete, Door will be closed";
+      window.speechSynthesis.speak(msg);
     }
     else
     {
@@ -67,14 +92,17 @@ function onMessage(evt)
     }
     doSend_ticket(); 
   }
-  else if (work_type==1 && username=="1")
+  else if (work_type==1 && username=="0")
   { //work_type ==1
     var message_send = {
       "work" : "1"
   };
     setTimeout(function() {
       websocket.send(JSON.stringify(message_send));
-      console.log(stylingType_done + ' DONE')
+      console.log(stylingType_done + ' DONE');
+
+      msg.text = stylingType_done+'is done';
+      window.speechSynthesis.speak(msg);
     }, 5000);
   }
   else{
@@ -87,11 +115,15 @@ function onError(evt)
   console.log('ERROR:'+ evt.data);
 }
 function doSend(stylingType)
-{
+{msg.text = stylingType+"starting!";
+  window.speechSynthesis.speak(msg);
+  msg.text = stylingType+"It will cost 10 seconds~!";
+  window.speechSynthesis.speak(msg);
+
   var message_send = {
     "work" : "1"
 };
-console.log(stylingType + ' START STYLING')
+console.log(stylingType + ' START STYLING');
 console.log("SENT: " + JSON.stringify(message_send));
 //작업시작 메시지
 websocket.send(JSON.stringify(message_send));
