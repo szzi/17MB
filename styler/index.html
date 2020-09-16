@@ -102,7 +102,6 @@
     <script src="webOSjs-0.1.0/webOS.js" charset="utf-8"></script>
     <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-database.js"></script>
-    <script src="websocket.js" charset="utf-8"></script>
     <link rel="stylesheet" type="text/css" href="./css/weather-icons.min.css">
 
     <script>
@@ -118,14 +117,6 @@
         firebase.initializeApp(config);
 
         var rootRef = firebase.database().ref();
-
-        // uid
-        for (var i = 1; i <= 4; i++) {
-            rootRef.child('users').child(i).once('value', function (data) {
-                console.log('1: ', data.val());
-                //document.getElementById("info").innerHTML+= data.val().name + "<br>";
-            });
-        }
 
         var isPlayingSHM = false;
         var eventListenerAdded = false;
@@ -397,6 +388,8 @@
             }
         }
     </script>
+    <script src="websocket.js" charset="utf-8"></script>
+
 </head>
 
 <body onload="init()">
