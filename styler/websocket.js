@@ -5,15 +5,20 @@ var work,username;
 var server_status;
 var stylingType_done;
 var msg = new SpeechSynthesisUtterance();
-  
 var voices = window.speechSynthesis.getVoices();
 msg.volume = 1;
 msg.text = "";
 msg.lang = 'en';
+var ment;
+
 
 function init()
 {
-  
+  //DB 접근 TEST
+  var starCountRef = firebase.database().ref('users/' + 'Jaeyeong' + '/1/main');
+starCountRef.on('value', function(snapshot) {
+  console.log("sanitary 나와야 함"+snapshot.val());
+});
 
 console.log('asdgasdg');
   output = document.getElementById("output");
@@ -64,7 +69,10 @@ function onMessage(evt)
       msg.text = "Hi, We recommend this course";
       window.speechSynthesis.speak(msg);
       writeToScreen("Hi "+person+ ", We recommend this course"); //소리내기: 뫄뫄님 안녕하세요!!!!! //DB에서 꺼내오기
-
+      //db select
+      rootRef.on("child_added",function(snapshot,prevChildKey){
+        var newPost = snapshot.val();
+      });
     }
   doSend_ticket();
 
@@ -73,17 +81,19 @@ function onMessage(evt)
   {
     if (person=="open")
     {
-      console.log("Dehumidification mode on, Door will be opened");
-      msg.text = "Dehumidification mode on, Door will be opened";
+      ment = "Dehumidification mode on, Door will be opened";
+      console.log(ment);
+      msg.text = ment;
       window.speechSynthesis.speak(msg);
     
       //소리내기 습도조절을 시작합니다!!!
     }
     else if (person=="close")
     {
-      console.log("Dehumidification complete");
+      ment = "Dehumidification complete, Door will be closed";
+      console.log(ment);
       //소리내기 습도조절이 완료되었습니다!
-      msg.text = "Dehumidification complete, Door will be closed";
+      msg.text = ment;
       window.speechSynthesis.speak(msg);
     }
     else
@@ -115,9 +125,9 @@ function onError(evt)
   console.log('ERROR:'+ evt.data);
 }
 function doSend(stylingType)
-{msg.text = stylingType+"starting!";
-  window.speechSynthesis.speak(msg);
-  msg.text = stylingType+"It will cost 10 seconds~!";
+{
+  ment = stylingType+"starting! It will cost 10 seconds~!";
+  msg.text = ment;
   window.speechSynthesis.speak(msg);
 
   var message_send = {
