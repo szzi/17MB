@@ -14,10 +14,9 @@ msg.lang = 'en';
 var ment;
 function init()
 {
-  var userId = 'Jaeyeong';
 
    firebase.database().ref('/users/Jaeyeong/1/main').once('value').then(function(snapshot) {
-console.log(snapshot.val());
+console.log('test'+snapshot.val());
 });
 
 
@@ -62,13 +61,17 @@ function onMessage(evt)
       //인사
     if (person!="" &&person!="ghost")
     {
-      msg.text = "Hi, We recommend this course";
-      window.speechSynthesis.speak(msg);
-      writeToScreen("Hi "+person+ ", We recommend this course"); //소리내기: 뫄뫄님 안녕하세요!!!!! //DB에서 꺼내오기
-      //db select
-      rootRef.on('child_added', function(data){
-        console.log(data.val())
+      var recommendedCourse = "this course";
+
+      firebase.database().ref('/users/'+person+'/1/main').once('value').then(function(snapshot) {
+         //소리내기: 뫄뫄님 안녕하세요!!!!!   
+        recommendedCourse = snapshot.val();
+        msg.text = "Hi, "+person+"We recommend"+recommendedCourse;
+        window.speechSynthesis.speak(msg);
+        writeToScreen(msg.text);
+        
       });
+      
     }
   doSend_ticket();
   }
