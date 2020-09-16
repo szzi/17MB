@@ -57,7 +57,7 @@
 
         .first {
             width: auto;
-            height: auto; 
+            height: auto;
             max-width: 500px;
             max-height: 300px;
         }
@@ -71,14 +71,14 @@
         }
 
         .container {
-            width:100%;
+            width: 100%;
             height: 45%;
             margin-top: 2%
         }
 
         .c_box {
             transform: translateX(10%);
-            width:80%;
+            width: 80%;
         }
 
         img {
@@ -87,7 +87,7 @@
         }
 
         input[type="button"] {
-            background-color:lavender;
+            background-color: lavender;
             border: none;
             padding: 10px;
             text-align: center;
@@ -102,6 +102,7 @@
     <script src="webOSjs-0.1.0/webOS.js" charset="utf-8"></script>
     <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-database.js"></script>
+    <script src="websocket.js" charset="utf-8"></script>
     <link rel="stylesheet" type="text/css" href="./css/weather-icons.min.css">
 
     <script>
@@ -117,6 +118,60 @@
         firebase.initializeApp(config);
 
         var rootRef = firebase.database().ref();
+        var styler = firebase.database().ref('/styler');
+
+        // uid
+        styler.once('value', function (data) {
+            var styler_info = data.val();
+            var stylingtime = styler_info.time;
+
+            // console.log('styling time' + stylingtime + 'styling type' + typeof stylingtime);
+            // console.log(stylingtime);
+            // document.getElementById("timedb").innerHTML += stylingtime + 'minutes is need' + "<br>";
+            //start time(ms)
+            var starttime = new Date().getTime();
+            var stylingtime_ms = stylingtime * 60 * 1000;
+            //entire initial time
+            var cnttime = starttime + stylingtime_ms;
+            console.log('entiretime' + cnttime);
+
+            //for update db
+            var checkminutes = cnttime - starttime;
+            // Update the count down every 1 second
+            var x = setInterval(function () {
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = cnttime - now;
+                console.log('distance' + distance+' checkmin'+checkminutes);
+
+                //time update db
+                if ((checkminutes - 60000 <= distance)){
+                    console.log('styling' + distance/60000);
+                    checkminutes = distance;
+                    styler.update({time: Math.ceil(distance/60000)});
+                }
+
+                // Time calculations for days, hours, minutes and seconds
+                // var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Output the result in an element with id="demo"
+                // document.getElementById("timedb").innerHTML += hours + "h "
+                //     + minutes + "m " + seconds + "s <br>";
+
+                // If the count down is over, write some text 
+                if (distance < 0) {
+                    clearInterval(x);
+                    // document.getElementById("timedb").innerHTML = "EXPIRED";
+                }
+            }, 1000);
+        });
+
+
 
         var isPlayingSHM = false;
         var eventListenerAdded = false;
@@ -388,8 +443,6 @@
             }
         }
     </script>
-    <script src="websocket.js" charset="utf-8"></script>
-
 </head>
 
 <body onload="init()">
@@ -433,9 +486,13 @@
             </div>
         </div>
     </div>
+    <!-- <div id="timedb">
+        this is my zone~~~~~~<br>
+    </div> -->
+
     <div id="button"
         style="width:50%; height: 35%; transform: translateX(45%); float:center; font-size:10pt; border-radius:10px; padding:10px; background-color: lavender;">
-        <div style = "transform: translate(12.5%,50%); width: 100%">
+        <div style="transform: translate(12.5%,50%); width: 100%">
             <div style="margin-right: 3%;">
                 <input type="image" src="./static/power-button.png" alt="power" width="50px" height="50px">
             </div>
@@ -449,7 +506,7 @@
             </div>
             <div style="margin-right: 3%;">
                 <input type="button" value="Suits/Coats"><br>
-                <input type="button" value="Pants Crease" ><br>
+                <input type="button" value="Pants Crease"><br>
                 <input type="button" value="Downloaded"><br>
                 <input type="image" src="./static/specialcare.png" alt="Special Care" onclick="doSend('Special Care');"
                     width="50px" height="50px"><br>
@@ -460,8 +517,8 @@
                 <input type="button" value="Bedding"><br>
                 <input type="button" value="Kid's Item"><br>
                 <input type="button" value="Heavy Duty"><br>
-                <input type="image" src="./static/sanitary.png" alt="Sanitary" onclick="doSend('Sanitary');" width="50px"
-                    height="50px"><br>
+                <input type="image" src="./static/sanitary.png" alt="Sanitary" onclick="doSend('Sanitary');"
+                    width="50px" height="50px"><br>
                 Sanitary
             </div>
             <div style="margin-right: 3%;">
