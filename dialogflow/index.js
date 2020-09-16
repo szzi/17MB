@@ -59,6 +59,46 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
       }
     });
   }
+ 
+  function getTime(agent) {
+        return styler.once("value").then((snapshot) => {
+            var c_info = snapshot.val();
+            //agent.add(c_info.time+' is left');
+            if ((c_info.time / 60) >= 1) {
+                var hours = c_info.time / 60;
+                var minutes = c_info.time % 60;
+                agent.add(c_info.main + ' ' + c_info.sub + ' cycle is ' + Math.floor(hours) + 'hour ' + minutes + 'minutes is left');
+            } else {
+                agent.add(c_info.main + ' ' + c_info.sub + ' cycle is ' + c_info.time + ' is left');
+            }
+        });
+    }
+ 
+ function recommendCycle(agent) {
+    return styler.once("value").then((snapshot) => {
+      var user = snapshot.val();
+
+      if (user.user != null) {
+        agent.add(user.user+' is using now');
+        
+        if (!user.working) {
+          return users.child(user.user)
+            .orderByChild('cnt')
+            .limitToLast(1)
+            .once("child_added")
+            .then((data) => {                
+            var personal = data.val();
+            var p_main = personal.main;
+            var p_sub = personal.sub;
+            agent.add(p_main +' '+ p_sub + ' would be good for you. Would you like to proceed with this?');
+          });
+        } else {
+          agent.add('Sorry, ' + user.main + ' ' + user.sub + ' cycle is already running.');
+          agent.add('It will be finished after ' + user.time + ' minutes.');
+        }
+      }
+    });
+  }
 
   function welcome(agent) {
     agent.add(`Hi, may I help you?`);
@@ -87,5 +127,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   intentMap.set('Default Fallback Intent', fallback);
   intentMap.set('get-agent-name', getAgentNameHandler);
   intentMap.set('StylingCycle', setCycle);
+  intentMap.set('StylingTime', getTime);
+  intentMap.set('recommend',recommendCycle);
   agent.handleRequest(intentMap);
 });
