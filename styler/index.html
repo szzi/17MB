@@ -440,35 +440,35 @@
                 <input type="image" src="./static/power-button.png" alt="power" width="50px" height="50px">
             </div>
             <div style="margin-right: 3%;">
-                <input type="button" value="Heavy"><br>
-                <input type="button" value="Normal"><br>
-                <input type="button" value="Light"><br>
-                <input type="image" src="./static/refresh.png" alt="Refresh" onclick="doSend('refresh');" width="50px"
+                <input type="button" value="Heavy"onclick = "doSend('Refresh','Heavy');"><br>
+                <input type="button" value="Normal"onclick = "doSend('Refresh','Normal');"><br>
+                <input type="button" value="Light"onclick = "doSend('Refresh','Light');><br>
+                <input type="image" src="./static/refresh.png" alt="Refresh" onclick="soundPlay('refresh');" width="50px"
                     height="50px"><br>
                 Refresh
             </div>
             <div style="margin-right: 3%;">
-                <input type="button" value="Suits/Coats"><br>
-                <input type="button" value="Pants Crease" ><br>
+                <input type="button" value="Suits/Coats"onclick = "doSend('Special Care','Suits and Coats');"><br>
+                <input type="button" value="Pants Crease" onclick = "doSend('Special Care','Pants Crease');"><br>
                 <input type="button" value="Downloaded"><br>
-                <input type="image" src="./static/specialcare.png" alt="Special Care" onclick="doSend('Special Care');"
+                <input type="image" src="./static/specialcare.png" alt="Special Care" onclick="soundPlay('Special Care');"
                     width="50px" height="50px"><br>
                 Special Care
             </div>
             <div style="margin-right: 3%;">
-                <input type="button" value="Heavy"><br>
-                <input type="button" value="Bedding"><br>
-                <input type="button" value="Kid's Item"><br>
-                <input type="button" value="Heavy Duty"><br>
-                <input type="image" src="./static/sanitary.png" alt="Sanitary" onclick="doSend('Sanitary');" width="50px"
+                <input type="button" value="Normal"onclick = "doSend('Sanitary','Normal');"><br>
+                <input type="button" value="Bedding"onclick = "doSend('Sanitary','Bedding');"><br>
+                <input type="button" value="Kid's Item"onclick = "doSend('Sanitary','Kids Item');"><br>
+                <input type="button" value="Heavy Duty"onclick = "doSend('Sanitary','Heavy Duty');"><br>
+                <input type="image" src="./static/sanitary.png" alt="Sanitary" onclick="soundPlay('Sanitary');" width="50px"
                     height="50px"><br>
                 Sanitary
             </div>
             <div style="margin-right: 3%;">
-                <input type="button" value="Normal"><br>
-                <input type="button" value="Rain/Snow"><br>
-                <input type="button" value="Time Dry"><br>
-                <input type="image" src="./static/dry.png" alt="Gentle Dry" onclick="doSend('Gentle Dry');" width="50px"
+                <input type="button" value="Normal"onclick = "doSend('Gentle Dry','Normal');"><br>
+                <input type="button" value="Rain/Snow"onclick = "doSend('Gentle Dry','Rain and Snow');"><br>
+                <input type="button" value="Time Dry"onclick = "doSend('Gentle Dry','Time Dry');"><br>
+                <input type="image" src="./static/dry.png" alt="Gentle Dry" onclick="soundPlay('Gentle Dry');" width="50px"
                     height="50px"><br>
                 Gentle Dry
             </div>

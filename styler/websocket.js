@@ -9,20 +9,21 @@ var stylingType_done;
 var msg = new SpeechSynthesisUtterance();
 var voices = window.speechSynthesis.getVoices();
 msg.volume = 1;
-msg.text = "";
+msg.text = "test!";
 msg.lang = 'en';
 var ment;
 function init()
 {
 
    firebase.database().ref('/users/Jaeyeong/1/main').once('value').then(function(snapshot) {
-console.log('test'+snapshot.val());
+console.log('test: '+snapshot.val());
 });
 
 
   console.log('asdgasdg');
   output = document.getElementById("output");
   console.log("init");
+  print(msg.text)
   window.speechSynthesis.speak(msg);
   print(init);
   testWebSocket();
@@ -103,34 +104,41 @@ function onMessage(evt)
   { //work_type ==1
     var message_send = {
       "work" : "1"
-  };
-    setTimeout(function() {
+    };
       websocket.send(JSON.stringify(message_send));
-      console.log(stylingType_done + ' DONE');
-      msg.text = stylingType_done+'is done';
-      window.speechSynthesis.speak(msg);
-    }, 5000);
+      console.log("got received from server");
   }
-  else{
-  }
+
 }
 function onError(evt)
 {
   console.log('ERROR:'+ evt.data);
 }
-function doSend(stylingType)
+function soundPlay(stylingType)
 {
-  ment = stylingType+"starting! It will cost 10 seconds~!";
+  ment = stylingType+"selected! Please press the specific menu";
   msg.text = ment;
   window.speechSynthesis.speak(msg);
+}
+function doSend(stylingType,stylingType_specific)
+{
+
+  firebase.database().ref('/cycle/'+stylingType+'/'+stylingType_specific+'/time').once('value').then(function(snapshot) {
+    //소리내기: 뫄뫄님 안녕하세요!!!!!   
+    remainedTime = snapshot.val();
+    msg.text = stylingType_specific+stylingType+"selected! It will cost"+remainedTime+"minutes!";
+    window.speechSynthesis.speak(msg);   
+  });
+  
   var message_send = {
-    "work" : "1"
-};
-console.log(stylingType + ' START STYLING');
-console.log("SENT: " + JSON.stringify(message_send));
-//작업시작 메시지
-websocket.send(JSON.stringify(message_send));
-stylingType_done = stylingType;
+    "work" : "1"  
+  };
+  
+  console.log(stylingType + ' START STYLING');
+  console.log("SENT: " + JSON.stringify(message_send));
+  //작업시작 메시지
+  websocket.send(JSON.stringify(message_send));
+  stylingType_done = stylingType;
 }
 function doSend_ticket()
 {
