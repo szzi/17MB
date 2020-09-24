@@ -133,7 +133,7 @@
             var stylingtime_ms = stylingtime * 60 * 1000;
             //entire initial time
             var cnttime = starttime + stylingtime_ms;
-            console.log('entiretime' + cnttime);
+          //  console.log('entiretime' + cnttime);
 
             //for update db
             var checkminutes = cnttime - starttime;
@@ -144,13 +144,14 @@
 
                 // Find the distance between now and the count down date
                 var distance = cnttime - now;
-                console.log('distance' + distance+' checkmin'+checkminutes);
+            //    console.log('distance' + distance+' checkmin'+checkminutes);
 
                 //time update db
                 if ((checkminutes - 60000 <= distance)){
-                    console.log('styling' + distance/60000);
-                    checkminutes = distance;
-                    styler.update({time: Math.ceil(distance/60000)});
+                  //  console.log('styling' + distance/60000);
+                    checkminutes = Math.ceil(distance/60000);
+                    styler.update({time:checkminutes});
+                    //console.log('time'+Math.ceil(distance/60000));
                 }
 
                 // Time calculations for days, hours, minutes and seconds
@@ -448,8 +449,9 @@
 <body onload="init()">
     <div class="container">
         <div class="c_box" style="border:3px solid lavender;">
-            <div style="float:left; padding-left:110px;padding-top:110px;width:30%;height:auto; display:inline-block;">
-                <img src = "static/webos.png"style="width:90%;height:auto;"/>
+            <div style="float:left; padding-left:80px;padding-top:50px;width:30%;height:auto; display:inline-block;">
+                <img src = "static/webos.png"style="width:90%;height:auto;"/><br/>
+                <div id="ButtonUI" style="float: left;font-size:32px;"></div>
             </div>
             <!--
             <div style="float:left; padding:10px; width:30%; transform: translate(30%, 20%)">
@@ -474,7 +476,7 @@
             </div>-->
 
             <div style="float:right; width:50%" id="todaysinfo">
-                <table style="width:100%; height:100%; transform: translateY(15%)">
+                <table style="width:100%; height:100%;">
                     <tr>
                         <td class="first">
                             <span class="todaystemp"> <img src="./static/weather.png"></span><br>
@@ -485,8 +487,6 @@
                         </td>
                     </tr>
                 </table>
-                <div id="ButtonUI" style="float: center">
-                </div>
             </div>
         </div>
     </div>

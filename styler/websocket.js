@@ -24,7 +24,7 @@ console.log('test: '+snapshot.val());
   output = document.getElementById("output");
   console.log("init");
   print(msg.text)
-  window.speechSynthesis.speak(msg);
+ // window.speechSynthesis.speak(msg);
   print(init);
   testWebSocket();
 }
