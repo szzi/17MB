@@ -63,7 +63,9 @@ function onMessage(evt)
     if (person!="" &&person!="ghost")
     {
       var recommendedCourse = "this course";
-
+      const styler = admin.database().ref('styler');
+      styler.update({user:person});
+      
       firebase.database().ref('/users/'+person+'/1/main').once('value').then(function(snapshot) {
          //소리내기: 뫄뫄님 안녕하세요!!!!!   
         recommendedCourse = snapshot.val();
