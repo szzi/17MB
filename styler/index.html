@@ -121,67 +121,64 @@
         var styler = firebase.database().ref('/styler');
 
         // uid
-        styler.once('value', function (data) {
-            var styler_info = data.val();
-            var stylingtime = styler_info.time;
+        styler.on('child_changed', function (data) {
+            if (data.key == 'working' && data.val()) {
+                styler.once('value', function (data) {
+                    var styler_info = data.val();
+                    var stylingtime = styler_info.time;
+                    //start time(ms)
+                    var starttime = new Date().getTime();
+                    var stylingtime_ms = stylingtime * 60 * 1000;
+                    //entire initial time
+                    var cnttime = starttime + stylingtime_ms;
+                    //  console.log('entiretime' + cnttime);
 
-            // console.log('styling time' + stylingtime + 'styling type' + typeof stylingtime);
-            // console.log(stylingtime);
-            // document.getElementById("timedb").innerHTML += stylingtime + 'minutes is need' + "<br>";
-            //start time(ms)
-            var starttime = new Date().getTime();
-            var stylingtime_ms = stylingtime * 60 * 1000;
-            //entire initial time
-            var cnttime = starttime + stylingtime_ms;
-            //  console.log('entiretime' + cnttime);
+                    //for update db
+                    var checkminutes = cnttime - starttime;
+                    // Update the count down every 1 second
+                    console.log("The new status is: " + data.key);
 
-            //for update db
-            var checkminutes = cnttime - starttime;
-            // Update the count down every 1 second
+                    var x = setInterval(function () {
+                        // Get today's date and time
+                        var now = new Date().getTime();
 
+                        // Find the distance between now and the count down date
+                        var distance = cnttime - now;
+                        //    console.log('distance' + distance+' checkmin'+checkminutes);
 
-            var x = setInterval(function () {
-                // Get today's date and time
-                if (styler_info.working==1) {
-                    var now = new Date().getTime();
-
-                    // Find the distance between now and the count down date
-                    var distance = cnttime - now;
-                    //    console.log('distance' + distance+' checkmin'+checkminutes);
-
-                    //time update db
-                    if ((checkminutes - 60000 <= distance)) {
-                        // console.log('styling' + distance / 60000);
-                        checkminutes = Math.ceil(distance / 60000);
-                        styler.update({ time: checkminutes });
-                        if (checkminutes == 0) {
-                            styler.update({ working: 0 });
+                        //time update db
+                        if ((checkminutes - 60000 <= distance)) {
+                            console.log('styling' + distance / 60000);
+                            checkminutes = Math.ceil(distance / 60000);
+                            styler.update({ time: checkminutes });
+                            if (checkminutes == 0) {
+                                styler.update({ working: 0 });
+                            }
+                            console.log('time' + Math.ceil(distance / 60000));
                         }
-                        // console.log('time' + Math.ceil(distance / 60000));
-                    }
 
-                    // Time calculations for days, hours, minutes and seconds
-                    // var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    var minutes = Math.ceil((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        // Time calculations for days, hours, minutes and seconds
+                        // var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        var minutes = Math.ceil((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    document.getElementById("timeleft").innerHTML = "<br>"+hours +":" +minutes+ "<br>";
-                    // Output the result in an element with id="demo"
-                    // document.getElementById("timedb").innerHTML += hours + "h "
-                    //     + minutes + "m " + seconds + "s <br>";
+                        document.getElementById("timeleft").innerHTML = "<br>" + hours + ":" + minutes + "<br>";
+                        // Output the result in an element with id="demo"
+                        // document.getElementById("timedb").innerHTML += hours + "h "
+                        //     + minutes + "m " + seconds + "s <br>";
 
-                    // If the count down is over, write some text 
-                    if (distance < 0) {
-                        clearInterval(x);
-                        // document.getElementById("timedb").innerHTML = "EXPIRED";
-                    }
-                }
-                // else{
-                //     clearInterval(x);
-                // }
-            }, 1000);
-
+                        // If the count down is over, write some text 
+                        if (distance < 0) {
+                            clearInterval(x);
+                            // document.getElementById("timedb").innerHTML = "EXPIRED";
+                        }
+                        // else{
+                        //     clearInterval(x);
+                        // }
+                    }, 1000);
+                });
+            }
             // timer is start when styler is working  
         });
 
@@ -465,10 +462,8 @@
     <div class="container">
         <div class="c_box" style="border:3px solid lavender;">
             <div style="float:left; padding-left:80px;padding-top:50px;width:30%;height:auto; display:inline-block;">
-
-                <img src = "static/webos.png"style="width:90%;height:auto;"/><br/>
-                <div id="ButtonUI" style="float: left;font-size:40px;">
-            </div>
+                <img src="static/webos.png" style="width:90%;height:auto;" /><br />
+                <div id="ButtonUI" style="float: left;font-size:32px;"></div>
             </div>
             <!--
             <div style="float:left; padding:10px; width:30%; transform: translate(30%, 20%)">
