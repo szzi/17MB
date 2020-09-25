@@ -63,18 +63,13 @@ function onMessage(evt)
     if (person!="" &&person!="ghost")
     {
       var recommendedCourse = "this course";
-      const styler = admin.database().ref('styler');
-      styler.update({user:person});
-      
-      firebase.database().ref('/users/'+person+'/1/main').once('value').then(function(snapshot) {
-         //소리내기: 뫄뫄님 안녕하세요!!!!!   
-        recommendedCourse = snapshot.val();
-        msg.text = "Hi, "+person+"We recommend"+recommendedCourse;
-        window.speechSynthesis.speak(msg);
-        writeToScreen(msg.text);
-        
-      });
-      
+
+      firebase.database().ref('styler').update({ user: person });
+
+      greet = "Hi, "+person;
+      msg.text = greet
+      window.speechSynthesis.speak(msg);
+      writeToScreen(greet);
     }
   doSend_ticket();
   }
@@ -150,11 +145,13 @@ function doSend_ticket()
   console.log("SENT: " + JSON.stringify(message_send));
   websocket.send(JSON.stringify(message_send));
 }
-function writeToScreen(message)
+function writeToScreen(message,message2)
 {
    var greet = document.getElementById("ButtonUI");
+   //var recommend = document.getElementById("ButtonUI_2");
    greet.innerHTML = message;
   //  output.appendChild(pre);
+  //recommend.innerHTML = message2;
    console.log(message)
 }
 // Notification code will be put here
