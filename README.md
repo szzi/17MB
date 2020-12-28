@@ -9,7 +9,7 @@ we add the next features to exist styler.
 3. automatic dehumidification
 
 ## System Architecture
-
+![system architecture](https://user-images.githubusercontent.com/42104898/103199631-9742e900-492e-11eb-88d2-72bb62342d51.png)
 
 ## Results
 
