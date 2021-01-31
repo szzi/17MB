@@ -1,6 +1,6 @@
 # Dr. Styler
 ⌨ team project for 2020S LG Internship <br>
-🎥 Demo Video:
+🎥 Demo Video: https://youtu.be/Z-JFcNFh8d0 
 
 ## Introduction
 we add the next features to exist styler.
